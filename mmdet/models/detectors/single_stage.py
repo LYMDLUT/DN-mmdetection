@@ -78,6 +78,7 @@ class SingleStageDetector(BaseDetector):
         Returns:
             dict[str, Tensor]: A dictionary of loss components.
         """
+        #img = torch.load('D://k.pth').cuda("cuda:0")
         super(SingleStageDetector, self).forward_train(img, img_metas)
         x = self.extract_feat(img)
         losses = self.bbox_head.forward_train(x, img_metas, gt_bboxes,
