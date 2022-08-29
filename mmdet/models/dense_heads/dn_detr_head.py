@@ -308,8 +308,13 @@ class DNDETRHead(AnchorFreeHead):
             dn_args = targets, scalar, label_noise_scale, box_noise_scale, num_patterns
         else:
             dn_args = 0
+        dpb7 = x.sum()
+        #x = torch.load('D:\\input_src.pth').cuda("cuda:0")
 ##############################################################
         x = self.input_proj(x)
+        #x1=torch.load('D:\\input.pth').cuda("cuda:0")
+        dpb8 = x.sum()
+        #dpb9 = x1.sum()
         # interpolate masks to have the same spatial shape with x
         masks = F.interpolate(
             masks.unsqueeze(1), size=x.shape[-2:]).to(torch.bool).squeeze(1)
@@ -322,10 +327,15 @@ class DNDETRHead(AnchorFreeHead):
         input_query_label, input_query_bbox, attn_mask, mask_dict = \
             prepare_for_dn(dn_args, embedweight, x.size(0), self.training, self.num_query, self.num_classes,
                            self.transformer.d_model, self.label_enc)
+        dpb4=input_query_label.sum()
+        dpb5=input_query_bbox.sum()
+        dpb6=x.sum()
 ###############################################################################
         outs_dec, _, reference = self.transformer(x, masks, input_query_bbox,
                                        pos_embed,self.fc_reg,self.activate,self.reg_ffn, target=input_query_label, attn_mask=attn_mask)
 ###############################################################################
+        dpb = outs_dec.sum()
+        dpb1 = reference.sum()
         reference_before_sigmoid = inverse_sigmoid(reference, 1e-3)
         outputs_coords = []
         if not self.bbox_embed_diff_each_layer:
@@ -348,6 +358,8 @@ class DNDETRHead(AnchorFreeHead):
 #######################################################################
         # all_bbox_preds = self.fc_reg(self.activate(
         #     self.reg_ffn(outs_dec))).sigmoid()
+        dbp2 = outputs_class.sum()
+        dpb3 = outputs_coord.sum()
         return outputs_class, outputs_coord, mask_dict
 
     @force_fp32(apply_to=('all_cls_scores_list', 'all_bbox_preds_list'))

@@ -940,6 +940,7 @@ class DNTransformer(BaseModule):
         pos_embed = pos_embed.view(bs, c, -1).permute(2, 0, 1)
         #refpoint_embed = refpoint_embed.unsqueeze(1).repeat(1, bs, 1)  # [num_query, dim] -> [num_query, bs, dim]
         mask = mask.view(bs, -1)  # [bs, h, w] -> [bs, h*w]
+        dpb=x.sum()
         memory = self.encoder(
             query=x,
             key=None,
@@ -947,6 +948,7 @@ class DNTransformer(BaseModule):
             query_pos=pos_embed,
             query_key_padding_mask=mask)
         #target = torch.zeros_like(embedweight)
+        dpb1 = memory.sum()
         if self.num_patterns > 0:
             l = target.shape[0]
             target[l - self.num_queries * self.num_patterns:] += \
@@ -1831,7 +1833,12 @@ class DetrTransformerDecoder(TransformerLayerSequence):
             return x
 
         intermediate = []
-        for layer in self.layers:
+        for i,layer in enumerate(self.layers):
+            kkk = query.sum()
+            kkk1 = kwargs["key"].sum()
+            kkk2 = kwargs["value"].sum()
+            kkk3 = kwargs["key_pos"].sum()
+            kkk4 = kwargs["query_pos"].sum()
             query = layer(query, *args, **kwargs)
             if self.return_intermediate:
                 if self.post_norm is not None:
@@ -1906,6 +1913,9 @@ class Transformer(BaseModule):
         query_embed = query_embed.unsqueeze(1).repeat(
             1, bs, 1)  # [num_query, dim] -> [num_query, bs, dim]
         mask = mask.view(bs, -1)  # [bs, h, w] -> [bs, h*w]
+        fpl=x.sum()
+        #pos_embed=torch.load('D:\\jjj.pth').cuda()
+        #query_embed=torch.load('D:\\jjj1.pth').cuda()
         memory = self.encoder(
             query=x,
             key=None,
@@ -1914,6 +1924,8 @@ class Transformer(BaseModule):
             query_key_padding_mask=mask)
         target = torch.zeros_like(query_embed)
         # out_dec: [num_layers, num_query, bs, dim]
+        dhj=memory.sum()
+        #memory = torch.load('D:\\jjj2.pth').cuda()
         out_dec = self.decoder(
             query=target,
             key=memory,

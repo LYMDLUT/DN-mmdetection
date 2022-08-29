@@ -1,6 +1,6 @@
 # Copyright (c) OpenMMLab. All rights reserved.
 import warnings
-
+import torch
 import torch.nn as nn
 import torch.utils.checkpoint as cp
 from mmcv.cnn import build_conv_layer, build_norm_layer, build_plugin_layer
@@ -643,12 +643,18 @@ class ResNet(BaseModule):
             x = self.norm1(x)
             x = self.relu(x)
         x = self.maxpool(x)
+        #torch.save(x, 'D://max.pth')
         outs = []
         for i, layer_name in enumerate(self.res_layers):
             res_layer = getattr(self, layer_name)
             x = res_layer(x)
+            # if i==2:
+            #     x= torch.load('D://k3.pth').cuda()
+            # if i==1:
+            #     torch.save(x,'D://kl2.pth')
             if i in self.out_indices:
                 outs.append(x)
+        #outs[0]=torch.load('D://k4.pth').cuda()
         return tuple(outs)
 
     def train(self, mode=True):

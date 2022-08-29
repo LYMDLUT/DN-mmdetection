@@ -273,6 +273,8 @@ class ConditionalDETRHead(AnchorFreeHead):
         ########################
         all_cls_scores = self.fc_cls(outs_dec)
         all_bbox_preds = outputs_coord
+        dbp2 = all_cls_scores.sum()
+        dpb3 = all_bbox_preds.sum()
         # all_bbox_preds = self.fc_reg(self.activate(
         #     self.reg_ffn(outs_dec))).sigmoid()
         return all_cls_scores, all_bbox_preds

@@ -259,12 +259,15 @@ class DETRHead(AnchorFreeHead):
         # position encoding
         pos_embed = self.positional_encoding(masks)  # [bs, embed_dim, h, w]
         # outs_dec: [nb_dec, bs, num_query, embed_dim]
+        dpb4 = x.sum()
         outs_dec, _ = self.transformer(x, masks, self.query_embedding.weight,
                                        pos_embed)
-
+        dpb = outs_dec.sum()
         all_cls_scores = self.fc_cls(outs_dec)
         all_bbox_preds = self.fc_reg(self.activate(
             self.reg_ffn(outs_dec))).sigmoid()
+        dbp2 = all_cls_scores.sum()
+        dpb3 = all_bbox_preds.sum()
         return all_cls_scores, all_bbox_preds
 
     @force_fp32(apply_to=('all_cls_scores_list', 'all_bbox_preds_list'))

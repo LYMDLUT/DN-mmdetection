@@ -10,7 +10,7 @@ model = dict(
         out_indices=(3, ),
         frozen_stages=1,
        # norm_cfg=dict(type='BN', requires_grad=False),
-        norm_cfg=dict(type='FrozenBatchNorm', requires_grad=False),
+        norm_cfg=dict(type='FrozenBatchNorm'),
         norm_eval=True,
         style='pytorch',
         init_cfg=dict(type='Pretrained', checkpoint='torchvision://resnet50')),
@@ -20,7 +20,7 @@ model = dict(
         query_dim=4,
         random_refpoints_xy=False,
         bbox_embed_diff_each_layer=False,
-        num_classes=80,
+        num_classes=91,
         in_channels=2048,
         transformer=dict(
             type='DNTransformer',
@@ -169,11 +169,11 @@ test_pipeline = [
         ])
 ]
 data = dict(
-    samples_per_gpu=2,
+    samples_per_gpu=1,
     workers_per_gpu=2,
-    train=dict(pipeline=train_pipeline),
-    val=dict(pipeline=test_pipeline),
-    test=dict(pipeline=test_pipeline))
+    train=dict(pipeline=train_pipeline, continuous_categories=False),
+    val=dict(pipeline=test_pipeline, continuous_categories=False),
+    test=dict(pipeline=test_pipeline, continuous_categories=False))
 # optimizer
 optimizer = dict(
     type='AdamW',
@@ -186,3 +186,4 @@ optimizer_config = dict(grad_clip=dict(max_norm=0.1, norm_type=2),detect_anomalo
 # learning policy
 lr_config = dict(policy='step', step=[40])
 runner = dict(type='EpochBasedRunner', max_epochs=50)
+#runner = dict(type='IterBasedRunner', max_iters=50)
