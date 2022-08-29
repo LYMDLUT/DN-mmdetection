@@ -16,7 +16,7 @@ model = dict(
         init_cfg=dict(type='Pretrained', checkpoint='torchvision://resnet50')),
     bbox_head=dict(
         type='DETRHead',
-        num_classes=91,
+        num_classes=80,
         in_channels=2048,
         transformer=dict(
             type='Transformer',
